@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <getopt.h>
+#include <string.h>
 
 
 /*
@@ -92,12 +92,12 @@ void select_lines( FILE* fh, int left, int right, int invert )
 void usage( void )
 {
     printf( "\n" );
-    printf( "  lines [-l <left>] [-r <right>] [-i] *default*\n" );
+    printf( "  lines [l <left>] [r <right>] [i] [<file>]\n" );
     printf( "\n" );
-    printf( "  -l               Left (first) line limit (default: 1).\n" );
-    printf( "  -r               Right (last) line limit (default: none).\n" );
-    printf( "  -i               Invert selection logic.\n" );
-    printf( "  *default*        File (default: stdin).\n" );
+    printf( "  l                Left (first) line limit (default: 1).\n" );
+    printf( "  r                Right (last) line limit (default: none).\n" );
+    printf( "  i                Invert selection logic.\n" );
+    printf( "  <file>           File (default: stdin).\n" );
     printf( "\n" );
     printf( "  Copyright (c) 2025 by Tero Isannainen\n" );
     printf( "\n" );
@@ -107,8 +107,8 @@ void usage( void )
 
 int main( int argc, char* argv[] )
 {
-    int option;
-    int option_index;
+    int   opt_index;
+    char* opt;
 
     int   left;
     int   right;
@@ -116,62 +116,44 @@ int main( int argc, char* argv[] )
     char* file;
     FILE* fh;
 
-
-    /* clang-format off */
-    static struct option long_options[] = {
-        { "help", no_argument, 0, 'h' },
-        { "left", required_argument, 0, 'l' },
-        { "right", required_argument, 0, 'r' },
-        { "invert", no_argument, 0, 'i' },
-        { "file", required_argument, 0, 0 },
-        { 0, 0, 0, 0 }
-    };
-    /* clang-format on */
-
     left = -1;
     right = -1;
     invert = 0;
+    file = NULL;
 
-    option_index = 0;
-
-    /* Parse command line options. */
-    while ( 1 ) {
-
-        option = getopt_long( argc, argv, "l:r:ih", long_options, &option_index );
-
-        if ( option == -1 ) {
-            break;
+    opt_index = 1;
+    while ( opt_index < argc ) {
+        opt = argv[ opt_index ];
+        if ( 0 ) {
+        } else if ( !strcmp( opt, "-h" ) ) {
+            usage();
+            opt_index++;
+            opt = argv[ opt_index ];
+            left = strtol( opt, NULL, 10 );
+        } else if ( !strcmp( opt, "l" ) ) {
+            opt_index++;
+            opt = argv[ opt_index ];
+            left = strtol( opt, NULL, 10 );
+        } else if ( !strcmp( opt, "r" ) ) {
+            opt_index++;
+            opt = argv[ opt_index ];
+            right = strtol( opt, NULL, 10 );
+        } else if ( !strcmp( opt, "i" ) ) {
+            invert = 1;
+        } else {
+            opt = argv[ opt_index ];
+            file = opt;
         }
-
-        switch ( option ) {
-            case 'h': // --help or -h
-                usage();
-                break;
-
-            case 'l':
-                left = strtol( optarg, NULL, 10 );
-                break;
-
-            case 'r':
-                right = strtol( optarg, NULL, 10 );
-                break;
-
-            case 'i':
-                invert = 1;
-                break;
-
-            default:
-                fprintf( stderr, "Use --help to see valid options.\n" );
-                exit( EXIT_FAILURE );
-                break;
-        }
+        opt_index++;
     }
 
-    if ( optind < argc ) {
-        file = argv[ optind ];
+    if ( file ) {
         fh = fopen( file, "r" );
+        if ( fh == NULL ) {
+            fprintf( stderr, "Could not open file: \"%s\"...\n", file );
+            exit( EXIT_FAILURE );
+        }
     } else {
-        file = NULL;
         fh = stdin;
     }
 
@@ -188,7 +170,6 @@ int main( int argc, char* argv[] )
     if ( fh != stdin ) {
         fclose( fh );
     }
-
 
     exit( EXIT_SUCCESS );
 }
