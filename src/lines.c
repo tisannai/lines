@@ -92,9 +92,9 @@ void select_lines( FILE* fh, int left, int right, int invert )
 void usage( void )
 {
     printf( "\n" );
-    printf( "  lines -l <left> [-r <right>] [-i] *default*\n" );
+    printf( "  lines [-l <left>] [-r <right>] [-i] *default*\n" );
     printf( "\n" );
-    printf( "  -l               Left (first) line limit.\n" );
+    printf( "  -l               Left (first) line limit (default: 1).\n" );
     printf( "  -r               Right (last) line limit (default: none).\n" );
     printf( "  -i               Invert selection logic.\n" );
     printf( "  *default*        File (default: stdin).\n" );
@@ -176,7 +176,7 @@ int main( int argc, char* argv[] )
     }
 
     if ( left == -1 ) {
-        usage();
+        left = 1;
     }
 
     if ( right == -1 ) {
