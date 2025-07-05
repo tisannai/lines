@@ -235,15 +235,70 @@ void select_lines( buf_t buf, cmd_t cmds, int cmd_cnt )
 void usage( void )
 {
     printf( "\n" );
-    printf( "  lines [l <left>] [r <right>] [i] [<file>]\n" );
+    printf( "  lines <commands> [<file>]\n" );
     printf( "\n" );
-    printf( "  l                Left (first) line limit (default: 1).\n" );
-    printf( "  r                Right (last) line limit (default: none).\n" );
-    printf( "  i                Invert selection logic.\n" );
-    printf( "  <file>           File (default: stdin).\n" );
+    printf( "  -h               Help.\n" );
+    printf( "  -d               Documentation.\n" );
+    printf( "\n" );
+    printf( "  Commands:\n" );
+    printf( "    t                Toggle pass state (default: off).\n" );
+    printf( "    p                Set pass on.\n" );
+    printf( "    r                Set pass off.\n" );
+    printf( "    m <index>        Move to line index (first line is at 0).\n" );
+    printf( "    r <index>        Jump relative to current line index.\n" );
+    printf( "    f <tag>          Find line with tag and stop at match.\n" );
+    printf( "    s <tag>          Find line with tag and skip matched line.\n" );
+    printf( "    <file>           File (default: stdin).\n" );
     printf( "\n" );
     printf( "  Copyright (c) 2025 by Tero Isannainen\n" );
     printf( "\n" );
+    exit( EXIT_FAILURE );
+}
+
+
+void documentation( void )
+{
+    printf( "`lines` is a small c-program for selecting lines from input file. The\n"
+            "input file is a disk file or stdin. The selected lines go to stdout.\n"
+            "\n"
+            "The selection is performed by progressing through each line, using\n"
+            "commands, and selecting which lines are passed and which are rejected.\n"
+            "For example:\n"
+            "\n"
+            "    lines m 10 p\n"
+            "\n"
+            "will move (`m`, absolute) to line at index 10 and pass (`p`, pass) the\n"
+            "following lines until the end of file. The pass state is off, by\n"
+            "default, in the beginning of file. The first 10 lines of the file\n"
+            "would be displayed with:\n"
+            "\n"
+            "    lines p j 10 r\n"
+            "\n"
+            "`p` (pass) sets pass state on. `j` jumps (relative from current, i.e.\n"
+            "from 0 to 10) to index 10. `r` (reject) sets the pass state off. Line\n"
+            "indeces start from 0.\n"
+            "\n"
+            "In addition to absolute and relative indeces, the line position can be\n"
+            "searched. With `s` command, the given tag is searched from the\n"
+            "beginning of line. If tag is found, the current line index is set.\n"
+            "\n"
+            "Commands:\n"
+            "\n"
+            "* `t`, toggle: Toggle output.\n"
+            "\n"
+            "* `p`, pass: Enable output.\n"
+            "\n"
+            "* `r`, reject: Disable output.\n"
+            "\n"
+            "* `m <value>`, absolute: Move to line index.\n"
+            "\n"
+            "* `j <value>`, relative: Jump relative to current line index.\n"
+            "\n"
+            "* `f <tag>`, find, no skip: Search string and stop to matching line.\n"
+            "\n"
+            "* `s <tag>`, find, with skip: Search string and jump over the matching\n"
+            "  line.\n" );
+
     exit( EXIT_FAILURE );
 }
 
@@ -271,6 +326,8 @@ int main( int argc, char* argv[] )
         if ( 0 ) {
         } else if ( !strcmp( argv[ oi ], "-h" ) ) {
             usage();
+        } else if ( !strcmp( argv[ oi ], "-d" ) ) {
+            documentation();
         } else if ( !strcmp( argv[ oi ], "t" ) ) {
             cmds[ ci++ ].type = CT_TOGGLE;
         } else if ( !strcmp( argv[ oi ], "p" ) ) {
