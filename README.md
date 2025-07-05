@@ -21,8 +21,9 @@ from 0 to 10) to index 10. `r` (reject) sets the pass state off. Line
 indeces start from 0.
 
 In addition to absolute and relative indeces, the line position can be
-searched. With `s` command, the given tag is searched from the
-beginning of line. If tag is found, the current line index is set.
+searched. With `f`/`s` command, the given tag is searched from the
+beginning of line. If tag is found, the current line index is set to
+the matched line, otherwise the end of file is reached.
 
 Commands:
 
